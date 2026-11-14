@@ -433,13 +433,13 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
 
 * **Packages:**
 
-  * **`OpenPonk-BormEditor`** `(~70 classes, <10 ext)` & **`OpenPonk-BormEditor-Tests`** `(~30 classes)`
+  * **`OpenPonk-BormEditor`** `(~50 classes, <10 ext)` & **`OpenPonk-BormEditor-Tests`** `(~30 classes)`
 
-    * **Tags:** `[Commands, Controllers, DiagramElements, Dsl, Examples, Extensions, Icons, Manifest, UI, Utility, ViewModels]`
+    * **Tags:** `[Commands, Controllers, DiagramElements, Dsl, Examples, Icons, Manifest, UI, ViewModels]`
 
     * **Internal baseline requires:** `PetitParser`, `OpenPonkBormModel`
 
-    * **Role:** BORM diagram view models, controllers, shapes, textual condition/DSL parser (`OPDslEditor`, `OPBormLangEditor`, `OPBormDslEditorCommand`), and UI commands.
+    * **Role:** BORM diagram view models, controllers, shapes, textual BormLang DSL (`BormLangGrammar`, `BormLangParser`, `BormLangSerializer`, `BormLangHighlighter`, `OPBormDslEditorCommand`, legacy Spec1 `OPDslEditor`), and UI commands.
 
   * **`OpenPonk-BormSimulation`** `(~15 classes, 0 ext)` & **`OpenPonk-BormSimulation-Tests`** `(<10 classes)`
 
