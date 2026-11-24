@@ -22,7 +22,7 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Internal baseline requires:** `Roassal`, `RoassalExporters`
     * **Role:** Extension layer over Roassal3 for incremental diagram rendering, polylines/edges, anchor constraints, attach points, creation feedback, markers, and canvas exports.
   * **`OpenPonk-Core`** `(~165 classes, ~15 ext)` & **`OpenPonk-Core-Tests`** `(~85 classes, 1 ext)`
-    * **Tags:** `[Announcements, Controllers, DiagramElements, DiagramOnlyElements, Icons, Layouting, LegacySupport-Diagrams, Manifest, Models, Persistence, Plugin, Templates, UICommands, UndoRedo, Version, ViewModels]`
+    * **Tags:** `[Announcements, Controllers, DiagramElements, DiagramOnlyElements, Icons, Layouting, LegacySupport-Diagrams, Manifest, Models, Persistence, Plugin, Templates, UndoRedo, Version, ViewModels]`
     * **Internal baseline requires:** `Magritte`, `Mocketry`, `XPath`, `NeoJSON`, `OpenPonk-Roassal`
     * **Role:** Core platform architecture: **Projects** (`OPProject`, `OPProjectController`), **ViewModels** (unified API over domain models, model structure & lifecycle, GUI labels/icons), **Controllers** (`OPController`, `OPDiagramController`, `OPElementController`, `OPHeadlessCanvasPresenter`), **DiagramElements** (`OPDiagram`, `OPOpenPonkDiagram`, `OPDiagramElement`, visual shapes), plugin registration (`OPPlugin`), project & diagram serialization, UI commands, and Undo/Redo. Never references `OpenPonk-Spec`.
   * **`OpenPonk-Morphic`** `(<10 classes, <5 ext)` & **`OpenPonk-Morphic-Tests`** `(1 class)`
@@ -31,20 +31,20 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Role:** Low-level Morphic components and layout adjustments.
   * **`OpenPonk-Spec`** `(~170 classes, ~25 ext)` & **`OpenPonk-Spec-Tests`** `(~55 classes, 5 ext)`
     * **Tags:** `[Application, Commands, Commands-CanvasPresenter, Commands-ProjectTree, Commands-RoassalShape, Commands-Workbench, Dialogs, Export, Form, Layouting, Manifest, Palettes, Windows]`
-    * **Internal baseline requires:** `Magritte`, `OpenPonkSynchronizedLinks`, `OpenPonkZoomer`, `OpenPonk-Morphic`, `OpenPonk-Core` (`OpenPonk-Spec-Tests` requires `OpenPonk-Spec` and `OpenPonk-Core-Tests`)
-    * **Role:** Main Spec2 GUI (`OPWorkbench`, `OPEditor`, `OPCanvasPresenter`, Project Tree, tool palettes, `OPPropertiesForm` / `OPDynamicForm` declarative property forms, dialogs). `OpenPonk-Spec-Tests` also hosts reusable abstract plugin test suites (`OPAbstractPluginExampleLifecycleTest`, `OPAbstractPluginExampleRoundtripTest`, `OPExamplePersistenceTest`, `OPLegacyProjectLoadTest`, `OPLegacyProjectLoadTestGenerator`).
+    * **Internal baseline requires:** `Magritte`, `OpenPonkSynchronizedLinks`, `OpenPonkZoomer`, `OpenPonk-Morphic`, `OpenPonk-Core` (`OpenPonk-Spec-Tests` requires `OpenPonk-Spec`, `OpenPonk-Core-Tests`, and `OpenPonk-Morphic-Tests`)
+    * **Role:** Main Spec2 GUI (`OPWorkbench`, `OPEditor`, `OPCanvasPresenter`, Project Tree, tool palettes, `OPPropertiesForm` / `OPDynamicForm` declarative property forms and `OPPropertiesFormMagritteVisitor` Magritte alternative, dialogs). `OpenPonk-Spec-Tests` also hosts reusable abstract plugin test suites (`OPAbstractPluginExampleViewModelTest`, `OPAbstractPluginExampleLifecycleTest`, `OPAbstractPluginExampleRoundtripTest`, `OPExamplePersistenceTest`, `OPLegacyProjectLoadTest`, `OPLegacyProjectLoadTestGenerator`).
   * **`OpenPonk-DevTools`** `(~15 classes, <5 ext)` & **`OpenPonk-DevTools-Tests`** `(2 classes)`
     * **Tags:** `[Export, Manifest, Releases, Watchdog]`
-    * **Internal baseline requires:** `OpenPonk-Core`, `OpenPonk-Spec` (loaded via `dev-plugin` group)
+    * **Internal baseline requires:** `OpenPonk-Core`, `OpenPonk-Spec` (loaded via `dev-plugin` group; `OpenPonk-DevTools-Tests` requires `OpenPonk-DevTools` and `OpenPonk-Core-Tests`)
     * **Role:** Developer utilities, release download statistics, test failure exporters, and runtime mutation watchdog tools.
 
 #### 2. `openponk-model`
 * **Purpose:** Optional foundational domain metamodel providing a quick bootstrap with common model features (`#uuid`, announcements, associations) for notations that do not require an independent custom metamodel.
-* **Baseline (`BaselineOfOpenPonkModel`):** External dependencies: None. Internal dependencies: `openponk` (`OpenPonk`, required in `default` group only; `plugin` group loads only `OpenPonk-Model`).
+* **Baseline (`BaselineOfOpenPonkModel`):** External dependencies: None. Internal dependencies: `openponk` (`OpenPonk`, declared in `default` group only; note that `OpenPonk-Model` tag `ViewModels` statically references `OpenPonk-Core`, so `openponk` must load before `openponk-model`).
 * **Packages:**
   * **`OpenPonk-Model`** `(~15 classes, 0 ext)` & **`OpenPonk-Model-Tests`** `(5 classes)`
     * **Tags:** `[Manifest, ModelObjects, ViewModels]`
-    * **Internal baseline requires:** None in `plugin` group (`OpenPonk` and `OpenPonk-Model-Tests` in `default` group).
+    * **Internal baseline requires:** None declared in `plugin` group (`OpenPonk` and `OpenPonk-Model-Tests` in `default` group; statically depends on `OpenPonk-Core` via `ViewModels`).
     * **Role:** Reusable base classes for domain models (`OPModelObject`, `OPDirectedAssociation`, etc.) and their base view models.
 
 #### 3. `plugins`
@@ -58,14 +58,14 @@ For global architectural rules, the five runtime component layers, instance mult
 * **Purpose:** Discrete-event and step-by-step simulation framework for OpenPonk models and diagrams.
 * **Baselines (Dual-Baseline Architecture):**
   1. **`BaselineOfOpenPonkModelSimulation`:** Internal dependencies: `openponk-model` (`OpenPonkModel`). Loads: `OpenPonk-ModelSimulation`, `OpenPonk-ModelSimulation-Tests`.
-  2. **`BaselineOfOpenPonkSimulation`:** Internal dependencies: `openponk` (`OpenPonk`), `OpenPonkModelSimulation`. Loads: `OpenPonk-Simulation`.
+  2. **`BaselineOfOpenPonkSimulation`:** Internal dependencies: `openponk` (`OpenPonk`), `OpenPonkModelSimulation`. Loads: `OpenPonk-Simulation`, `OpenPonk-Simulation-Tests`.
 * **Packages:**
   * **`OpenPonk-ModelSimulation`** `(~20 classes, 0 ext)` & **`OpenPonk-ModelSimulation-Tests`** `(~20 classes)`
     * **Tags:** `[Events, Manifest, Simulators]`
     * **Internal baseline requires:** `OpenPonkModel`
     * **Role:** GUI-independent model simulation framework (event queues, step simulators).
-  * **`OpenPonk-Simulation`** `(<10 classes, 0 ext)`
-    * **Tags:** `[Manifest, Uncategorized]`
+  * **`OpenPonk-Simulation`** `(<10 classes, 0 ext)` & **`OpenPonk-Simulation-Tests`** `(<10 classes)`
+    * **Tags:** `[Manifest, Simulation]`
     * **Internal baseline requires:** `OpenPonk`, `OpenPonkModelSimulation`
     * **Role:** Bridges model simulators with OpenPonk GUI and diagram controllers.
 
@@ -74,8 +74,8 @@ For global architectural rules, the five runtime component layers, instance mult
 * **Architectural & Verification Note:** Loaded into the all-in-one build via `class-editor` (`complete-plugin`). While toolbar submenu population (`Model -> Git model repository`) is covered by a unit test (`OPGitModelMenuTest` in `OpenPonk-Git-Tests`), end-to-end upload/download functionality was historically tested only with UML diagrams and has not been actively used or verified in recent practice.
 * **Baseline (`BaselineOfOpenPonkGit`):** External dependencies: None. Internal dependencies: `openponk` (`OpenPonk`).
 * **Packages:**
-  * **`OpenPonk-Git`** `(~20 classes, 0 ext)` & **`OpenPonk-Git-Tests`** `(1 class)`
-    * **Tags:** `[Commands, Manifest, Uncategorized]`
+  * **`OpenPonk-Git`** `(~20 classes, 0 ext)` & **`OpenPonk-Git-Tests`** `(10 classes)`
+    * **Tags:** `[Commands, GUI, Manifest, Model]`
     * **Internal baseline requires:** `OpenPonk`
     * **Role:** Toolbar commands and dialogs for pushing/fetching a project (diagram + model) to/from GitHub and GitLab.
 
@@ -85,10 +85,10 @@ For global architectural rules, the five runtime component layers, instance mult
 * **Purpose:** UML Class Diagram editor plugin (with generic UML profile support).
 * **Architectural Note:** `OpenPonk-ClassEditor` itself is a pure UML class diagram editor and contains no OntoUML-specific logic. OntoUML is implemented in separate repositories that extend `class-editor`. While `OpenPonk-ClassEditor` can theoretically be loaded standalone without OntoUML (via the `plugin` or `default` baseline groups), standard builds always load the `complete` group, which uses `OpenPonk-ClassEditor-Plugins` to pull in the OntoUML ecosystem and `openponk-git`.
 * **Baseline (`BaselineOfOpenPonkClassEditor`):**
-  * **External dependencies:** None directly (transitively pulls `PetitParser`, `XMLWriter`, `XMLParser` via dependencies).
+  * **External dependencies:** None directly (transitively pulls `XMLWriter`, `XMLParser` via dependencies).
   * **Internal dependencies:**
     * Group `plugin` (loads `OpenPonk-ClassEditor`, `OpenPonk-ClassEditor-Tests`): requires `uml-xmi` (`OpenPonkUMLXMI`), `uml-bootstrap-generator` (`OpenPonkUMLBootstrapGenerator`), `uml-profiles` (`OpenPonkUMLProfiles`).
-    * Group `complete-plugin` (loads `OpenPonk-ClassEditor-Plugins`): additionally requires `ontouml-verifications` (`OpenPonkOntoUMLVerifications`), `ontouml-patterns` (`OpenPonkOntoUMLPatterns`), `openponk-ontouml-to-uml-transformation` (`OpenPonkOntoUMLTransformations`), `openponk-git` (`OpenPonkGit`).
+    * Group `complete-plugin` (loads `OpenPonk-ClassEditor-Plugins`): additionally requires `ontouml-verifications` (`OpenPonkOntoUMLVerifications`), `ontouml-patterns` (`OpenPonkOntoUMLPatterns`), `openponk-ontouml-to-uml-transformation` (`OpenPonkOntoUMLTransformations`), `openponk-git` (`OpenPonkGit`). To break the cycle with OntoUML packages depending back on `class-editor`, `baseline:` skips `OpenPonk-ClassEditor-Plugins` once `BaselineOfOpenPonkOntoUMLVerifications` is already loaded in `Smalltalk globals`.
     * Group `default`: `openponk` + `plugin`. Group `complete`: `default` + `complete-plugin`.
 * **Active Packages:**
   * **`OpenPonk-ClassEditor`** `(~130 classes, ~25 ext)` & **`OpenPonk-ClassEditor-Tests`** `(~55 classes)`
@@ -119,7 +119,7 @@ For global architectural rules, the five runtime component layers, instance mult
 
 #### 8. `borm-editor`
 * **Purpose:** Diagram editor and simulator for BORM Object Relation Diagrams (ORD).
-* **Baseline (`BaselineOfOpenPonkBormEditor`):** External dependencies: `PetitParser`. Internal dependencies: `borm-model` (`OpenPonkBormModel`), `simulation` (`OpenPonkSimulation`), `openponk` (`OpenPonk`).
+* **Baseline (`BaselineOfOpenPonkBormEditor`):** External dependencies: `PetitParser`. Internal dependencies: `borm-model` (`OpenPonkBormModel`), `simulation` (`OpenPonkSimulation`), `openponk` (`OpenPonk`). Groups: `default`, `plugin`, `no-simulation`, `no-simulation-plugin`.
 * **Packages:**
   * **`OpenPonk-BormEditor`** `(~50 classes, <10 ext)` & **`OpenPonk-BormEditor-Tests`** `(~30 classes)`
     * **Tags:** `[Commands, Controllers, DiagramElements, Dsl, Examples, Icons, Manifest, UI, ViewModels]`
@@ -127,22 +127,22 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Role:** BORM diagram view models, controllers, shapes, textual BormLang DSL (`BormLangGrammar`, `BormLangParser`, `BormLangSerializer`, `BormLangHighlighter`, `OPBormDslEditorCommand`, legacy Spec1 `OPDslEditor`), and UI commands.
   * **`OpenPonk-BormSimulation`** `(~15 classes, 0 ext)` & **`OpenPonk-BormSimulation-Tests`** `(<10 classes)`
     * **Tags:** `[Manifest, Simulation]`
-    * **Internal baseline requires:** `OpenPonk-BormEditor`, `OpenPonkSimulation`
+    * **Internal baseline requires:** `OpenPonk-BormEditor`, `OpenPonkSimulation` (`OpenPonk-BormSimulation-Tests` requires `OpenPonk-BormSimulation` and `OpenPonk-BormEditor-Tests`)
     * **Role:** Token-based process simulator and visualization for BORM diagrams.
   * **`Borm-OpenCabe-Importer`** `[deprecated]` – Unloaded importer for the defunct Eclipse-based OpenCABE tool. Do not use.
 
 #### 9. `BPMN`
 * **Purpose:** Editor, validator, simulator, and XML serializer for BPMN 2.0 diagrams.
-* **Baseline (`BaselineOfOpenPonkBPMN`):** External dependencies: None directly (transitively pulls `XMLParser` via `xml-dom-visitor`). Internal dependencies: `openponk` (`OpenPonk`), `openponk-model` (`OpenPonkModel`), `simulation` (`OpenPonkSimulation`), `xml-dom-visitor` (`OpenPonkXMLDOMVisitor`).
+* **Baseline (`BaselineOfOpenPonkBPMN`):** External dependencies: None. Internal dependencies: `openponk` (`OpenPonk`), `openponk-model` (`OpenPonkModel`), `simulation` (`OpenPonkSimulation`).
 * **Packages:**
   * **`OpenPonk-BPMN`** `(~115 classes, <5 ext)` & **`OpenPonk-BPMN-Tests`** `(~35 classes)`
     * **Tags:** `[Announcements, Commands, Controllers, DiagramElements, Examples, Factory, Icons, Manifest, Models, Plugin, ViewModels]`
     * **Internal baseline requires:** `OpenPonk`, `OpenPonkModel`
     * **Role:** Core BPMN 2.0 domain model, view models, diagram elements, controllers, and workbench plugin.
-  * **`OpenPonk-BPMN-XML`** `(~15 classes, 0 ext)` & **`OpenPonk-BPMN-XML-Tests`** `(2 classes)`
-    * **Tags:** `[DOM, Manifest, Reader, Writer]`
-    * **Internal baseline requires:** `OpenPonk-BPMN`, `OpenPonkXMLDOMVisitor`
-    * **Role:** BPMN 2.0 XML/XSD DOM import and export.
+  * **`OpenPonk-BPMN-XML`** `(<10 classes, 0 ext)` & **`OpenPonk-BPMN-XML-Tests`** `(2 classes)`
+    * **Tags:** `[Manifest, Writer]`
+    * **Internal baseline requires:** `OpenPonk-BPMN`
+    * **Role:** BPMN 2.0 XML export.
   * **`OpenPonk-BPMN-Validation`** `(~55 classes, 0 ext)` & **`OpenPonk-BPMN-Validation-Tests`** `(~25 classes)`
     * **Tags:** `[Controllers, Manifest, Messages, Results, Settings, UI, Validation-Classes]`
     * **Internal baseline requires:** `OpenPonk-BPMN`
@@ -231,9 +231,9 @@ For global architectural rules, the five runtime component layers, instance mult
 
 #### 17. `uml-profiles`
 * **Purpose:** Core UML profile application mechanism and small example/test profiles.
-* **Baseline (`BaselineOfOpenPonkUMLProfiles`):** External dependencies: None. Internal dependencies: `uml-metamodel` (`OpenPonkUMLMetamodel`).
+* **Baseline (`BaselineOfOpenPonkUMLProfiles`):** External dependencies: None. Internal dependencies: `uml-metamodel` (`OpenPonkUMLMetamodel`), `uml-xmi` (`OpenPonkUMLXMI`).
 * **Packages:**
-  * **`OpenPonk-UML-Profiles`** `(<10 classes, <10 ext)` – **Tags:** `[Manifest, Profile]`; **Requires:** `OpenPonkUMLMetamodel`; **Role:** Core profile registration and stereotype application mechanism extending UML metamodel elements.
+  * **`OpenPonk-UML-Profiles`** `(<10 classes, <10 ext)` & **`OpenPonk-UML-Profiles-Tests`** `(3 classes)` – **Tags:** `[Manifest, Profile]` (tests: `[ClockProfile, IssuesProfile, Profile]`); **Requires:** `OpenPonkUMLMetamodel`, `OpenPonkUMLXMI`; **Role:** Core profile registration and stereotype application mechanism extending UML metamodel elements.
   * **`OpenPonk-ClockProfile`** `(<10 classes, <5 ext)` – **Tags:** `[Manifest, Metamodel, Model]`; **Requires:** `OpenPonk-UML-Profiles`; **Role:** Minimal example/test UML profile demonstrating how a profile is implemented and generated.
   * **`OpenPonk-IssuesProfile`** `(<10 classes, <5 ext)` – **Tags:** `[Manifest, Metamodel, Model]`; **Requires:** `OpenPonk-UML-Profiles`; **Role:** Minimal example/test UML profile demonstrating how a profile is implemented and generated.
 
@@ -279,11 +279,11 @@ For global architectural rules, the five runtime component layers, instance mult
 
 #### 22. `ontouml-verifications`
 * **Purpose:** OntoUML model verification and ontological anti-pattern detection.
-* **Baseline (`BaselineOfOpenPonkOntoUMLVerifications`):** External dependencies: `PetitParser`. Internal dependencies: `ontouml-modelquery` (`OpenPonkOntoUMLModelQuery`).
+* **Baseline (`BaselineOfOpenPonkOntoUMLVerifications`):** External dependencies: None. Internal dependencies: `ontouml-modelquery` (`OpenPonkOntoUMLModelQuery`).
 * **Packages:**
-  * **`OpenPonk-OntoUML-Verifications`** `(~65 classes, 0 ext)` & **`OpenPonk-OntoUML-Verifications-Tests`** `(~45 classes)`
-    * **Tags:** `[Antipattern-Classes, Commands, Controllers, DocumentationReferences, Exceptions, Manifest, Messages, Results, Settings, Traits, UI, Updating, Verification-Classes]`
-    * **Internal baseline requires:** `OpenPonkOntoUMLModelQuery`, `PetitParser`
+  * **`OpenPonk-OntoUML-Verifications`** `(~55 classes, 0 ext)` & **`OpenPonk-OntoUML-Verifications-Tests`** `(~40 classes)`
+    * **Tags:** `[Antipattern-Classes, Commands, Controllers, DocumentationReferences, Manifest, Messages, Results, Settings, Traits, UI, Verification-Classes]`
+    * **Internal baseline requires:** `OpenPonkOntoUMLModelQuery`
     * **Role:** OntoUML syntax/semantics verification rules, anti-pattern detectors, and diagnostic UI.
 
 #### 23. `openponk-ontouml-to-uml-transformation`
@@ -312,15 +312,15 @@ For global architectural rules, the five runtime component layers, instance mult
 #### 26. `xmi`
 * **Purpose:** Generic XMI file to XMI object-graph materialization and serialization.
 * **Architectural Note:** Written as a generic XMI library, but consumed exclusively by the UML ecosystem (`uml-xmi`, `uml-bootstrap-generator`).
-* **Baseline (`BaselineOfOpenPonkXMI`):** External dependencies: `XMLWriter`. Internal dependencies: `xml-dom-visitor` (`OpenPonkXMLDOMVisitor`).
+* **Baseline (`BaselineOfOpenPonkXMI`):** External dependencies: `XMLWriter` (loads `Core`). Internal dependencies: `xml-dom-visitor` (`OpenPonkXMLDOMVisitor`).
 * **Packages:**
   * **`OpenPonk-XMI`** `(~15 classes, 0 ext)` & **`OpenPonk-XMI-Tests`** `(<10 classes)` – **Tags:** `[DOM, Manifest, Reader, Writer]`; **Requires:** `OpenPonkXMLDOMVisitor`, `XMLWriter`; **Role:** Reads and writes XMI files into/from intermediate XMI element graphs.
-  * **`OpenPonk-XMI-Inspection`** `(<5 classes, ~10 ext)` – **Tags:** `[Manifest]`; **Requires:** `OpenPonk-XMI`; **Role:** Inspector extensions for inspecting XMI graph nodes.
+  * **`OpenPonk-XMI-Inspection`** `(<5 classes, ~10 ext)` & **`OpenPonk-XMI-Inspection-Tests`** `(1 class)` – **Tags:** `[Manifest]` (tests: `[Inspection]`); **Requires:** `OpenPonk-XMI`; **Role:** Inspector extensions for inspecting XMI graph nodes.
 
 #### 27. `xml-dom-visitor`
 * **Purpose:** Visitor pattern implementation for `XMLParser` DOM trees.
-* **Architectural Note:** Required by `BaselineOfOpenPonkXMI` and `BaselineOfOpenPonkBPMN`. Adds `#accept:` extension methods to `XMLCData`, `XMLDocument`, `XMLElement`, and `XMLString`, though its own classes (`XMLDOMVisitor`, `XMLDOMElementVisitor`, `XMLDOMTypedElement`) currently have no direct references from other OpenPonk packages.
-* **Baseline (`BaselineOfOpenPonkXMLDOMVisitor`):** External dependencies: `XMLParser`. Internal dependencies: None.
+* **Architectural Note:** Required by `BaselineOfOpenPonkXMI`. Adds `#accept:` extension methods to `XMLCData`, `XMLDocument`, `XMLElement`, and `XMLString`; `OpenPonk-XMI` (`OPXMIReaderVisitor`) subclasses `XMLDOMVisitor`, while `XMLDOMElementVisitor` and `XMLDOMTypedElement` remain standalone public API classes without other OpenPonk references.
+* **Baseline (`BaselineOfOpenPonkXMLDOMVisitor`):** External dependencies: `XMLParser` (loads `Core`). Internal dependencies: None.
 * **Packages:**
   * **`OpenPonk-XMLDOMVisitor`** `(<10 classes, <10 ext)` & **`OpenPonk-XMLDOMVisitor-Tests`** `(4 classes)` – **Tags:** `[DOM, Manifest, Visitor]`; **Requires:** `XMLParser`; **Role:** Visitor double-dispatch and typed element wrappers over XML DOM nodes.
 
@@ -350,13 +350,14 @@ For global architectural rules, the five runtime component layers, instance mult
 
 ### 2.1 Architectural Layers (Bottom-Up Dependency Flow)
 * **Layer 0 — Standalone Low-Level Utilities & Base Metamodels (Zero Internal Dependencies):** `synchronized-links`, `zoomer`, `pharo-changes-builder`, `xml-dom-visitor` (external `XMLParser`), `uml-metamodel` (`OpenPonk-UML-Meta` $\rightarrow$ `OpenPonk-UML-Metamodel`).
-* **Layer 1 — Core Infrastructure, Optional Base Metamodel & Serialization Utilities:** `openponk` (`OpenPonk-Roassal` $\rightarrow$ `OpenPonk-Core`; `OpenPonk-Morphic` $\rightarrow$ `OpenPonk-Spec`; `OpenPonk-DevTools`), `openponk-model`, `xmi`, `uml-profiles` (`OpenPonk-UML-Profiles` $\rightarrow$ `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile`).
-* **Layer 2 — Domain Extensions, Simulation Framework & UML Tooling:** `simulation` (`BaselineOfOpenPonkModelSimulation` $\rightarrow$ `BaselineOfOpenPonkSimulation`), `openponk-git`, `borm-model`, `uml-xmi`, `uml-bootstrap-generator` (`OpenPonk-UML-Bootstrap` $\rightarrow$ `OpenPonk-UML-BootstrapGenerator`).
-* **Layer 3 — Notation Editors (Core Plugins):** `class-editor` (`plugin` group), general notation editors (`DEMO`, `fsm-editor`, `markov-chains`, `ERD`), and simulated/validated notation editors (`borm-editor`, `BPMN`, `petrinets`).
-* **Layer 4 — OntoUML Ecosystem & Class Editor Extensions:** `ontouml-profile` (`OpenPonk-OntoUML-Profile` $\rightarrow$ `OpenPonk-OntoUML-Plugin`), `ontouml-modelquery`, `ontouml-patterns`, `ontouml-verifications`, `openponk-ontouml-to-uml-transformation`, and `class-editor` (`complete-plugin` group: `OpenPonk-ClassEditor-Plugins`).
-* **Layer 5 — All-in-One Distribution Assembly:** `plugins` (`BaselineOfOpenPonkPlugins`).
+* **Layer 1 — Core Infrastructure & Generic XMI Utilities:** `openponk` (`OpenPonk-Roassal` $\rightarrow$ `OpenPonk-Core`; `OpenPonk-Morphic` $\rightarrow$ `OpenPonk-Spec`; `OpenPonk-DevTools`), `xmi` (`OpenPonk-XMI` $\rightarrow$ `OpenPonk-XMI-Inspection`).
+* **Layer 2 — Optional Base Metamodel, Git Integration & UML Tooling:** `openponk-model` (statically references `OpenPonk-Core` via `ViewModels`), `openponk-git`, `uml-xmi`, `uml-bootstrap-generator` (`OpenPonk-UML-Bootstrap` $\rightarrow$ `OpenPonk-UML-BootstrapGenerator`).
+* **Layer 3 — Domain Models, Simulation Framework & UML Profiles:** `borm-model`, `simulation` (`BaselineOfOpenPonkModelSimulation` $\rightarrow$ `BaselineOfOpenPonkSimulation`), `uml-profiles` (`OpenPonk-UML-Profiles` $\rightarrow$ `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile`).
+* **Layer 4 — Notation Editors (Core Plugins):** `class-editor` (`plugin` group), general notation editors (`DEMO`, `fsm-editor`, `markov-chains`, `ERD`), and simulated/validated notation editors (`borm-editor`, `BPMN`, `petrinets`).
+* **Layer 5 — OntoUML Ecosystem & Class Editor Extensions:** `ontouml-profile` (`OpenPonk-OntoUML-Profile` $\rightarrow$ `OpenPonk-OntoUML-Plugin`) $\rightarrow$ `ontouml-modelquery`, `ontouml-patterns` $\rightarrow$ `ontouml-verifications`, `openponk-ontouml-to-uml-transformation`, and `class-editor` (`complete-plugin` group: `OpenPonk-ClassEditor-Plugins`).
+* **Layer 6 — All-in-One Distribution Assembly:** `plugins` (`BaselineOfOpenPonkPlugins`).
 
 ### 2.2 Architectural Observations & Maintenance Notes
 1. **Transitive Loading of `openponk-git` via `class-editor`:** `OpenPonk-Git` depends only on `openponk` core and provides workbench-level Git commands (`Model -> Git model repository`), but in the all-in-one build (`BaselineOfOpenPonkPlugins`) it is loaded transitively via `BaselineOfOpenPonkClassEditor` (`complete-plugin` $\rightarrow$ `OpenPonk-ClassEditor-Plugins`) rather than as a direct top-level dependency in `BaselineOfOpenPonkPlugins`.
-2. **Unreferenced Visitor Classes in `xml-dom-visitor`:** While `BaselineOfOpenPonkXMI` and `BaselineOfOpenPonkBPMN` depend on `OpenPonkXMLDOMVisitor`, neither `OpenPonk-XMI` nor `OpenPonk-BPMN-XML` currently subclasses or references `XMLDOMVisitor`, `XMLDOMElementVisitor`, or `XMLDOMTypedElement`.
+2. **Public API Visitor Classes in `xml-dom-visitor`:** `OpenPonk-XMI` (`OPXMIReaderVisitor`) subclasses `XMLDOMVisitor`, whereas `XMLDOMElementVisitor` and `XMLDOMTypedElement` are retained as documented standalone public API classes without direct references from other OpenPonk packages.
 3. **Remaining Dead Packages in Active Repositories:** `Borm-OpenCabe-Importer` (in `borm-editor`), `OP-UML-GTExtensions` (in `uml-metamodel`), and the 7 `[legacy / unmaintained]` packages in `class-editor` still reside in their respective Git repositories as unloaded code.

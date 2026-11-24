@@ -59,7 +59,7 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
      * Exposes structural relationships of the model (containment hierarchy, associations, parent/child elements) and property accessors/mutators (`#propertyNamed:`, `#propertyNamed:put:`, `#structuralPropertySelectors`).
      * Handles **creation and deletion** of domain model elements.
      * Defines diagram-independent GUI metadata, such as the **icon** and **unified display name/label** used in trees, lists, and forms.
-   * **Primary GUI Consumers:** Diagram-independent GUI components—specifically the **Project Tree** and **Properties Form (`OPPropertiesForm` / `OPDynamicForm` declarative bindings)**—operate primarily on **ViewModels**, as they require a uniform representation of the model and its structure rather than diagram visuals.
+   * **Primary GUI Consumers:** Diagram-independent GUI components—specifically the **Project Tree** and **Properties Form (`OPPropertiesForm` / `OPDynamicForm` declarative bindings or Magritte descriptions via `OPPropertiesFormMagritteVisitor`)**—operate primarily on **ViewModels**, as they require a uniform representation of the model and its structure rather than diagram visuals.
    * **Persistence:** **Transient** (runtime-only). Created when a project is opened in an `OPWorkbench` and destroyed when the project is closed.
 
 3. **DiagramElement / Shape (`DiagramElements` tag):**
@@ -82,7 +82,7 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
    * **Persistence:** **Transient** (runtime-only). Controllers exist **only** for diagrams and diagram elements that are currently loaded and displayed on a Roassal canvas inside an active `OPEditor` (or headless test).
 
 5. **Workbench & Editor GUI (`OpenPonk-Spec`):**
-   * **`OPWorkbench`:** The main Spec2 window representing a single open project (backed by `OPProjectController`). Hosts project-wide views (**Project Tree**, **Properties Form** built on `OPDynamicForm` declarative bindings) that interact with **ViewModels**, and a tabbed area hosting $0..N$ **`OPEditor`** instances.
+   * **`OPWorkbench`:** The main Spec2 window representing a single open project (backed by `OPProjectController`). Hosts project-wide views (**Project Tree**, **Properties Form** built on `OPDynamicForm` declarative bindings or Magritte descriptions) that interact with **ViewModels**, and a tabbed area hosting $0..N$ **`OPEditor`** instances.
    * **`OPEditor`:** A single tab inside `OPWorkbench` dedicated to one open diagram (`OPOpenPonkDiagram`). Holds a reference to the diagram's `OPDiagramController`, the notation tool palette, diagram toolbar, and an **`OPCanvasPresenter`** (a subclass of `SpRoassalPresenter` that embeds the Roassal3 `RSCanvas` into Spec2). Operates on **Controllers** and **DiagramElements**.
 
 ### 2.3 Instance Multiplicities (Within One Open `OPWorkbench`)
@@ -124,14 +124,14 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
 | Repository | Category | Production Package(s) | Internal Prerequisites | Role & Scope |
 | :--- | :--- | :--- | :--- | :--- |
 | **`openponk`** | Core & Platform | `OpenPonk-Roassal`, `OpenPonk-Core`, `OpenPonk-Morphic`, `OpenPonk-Spec`, `OpenPonk-DevTools` | `synchronized-links`, `zoomer` | Core platform, ViewModels, Controllers, Shapes, Spec2 GUI, Undo/Redo, persistence |
-| **`openponk-model`** | Core & Platform | `OpenPonk-Model` | *(none in `plugin` group)* | Optional base domain metamodel (`OPModelObject`, `#uuid`, announcements) |
+| **`openponk-model`** | Core & Platform | `OpenPonk-Model` | `openponk` *(static via `ViewModels`; baseline `default` group only)* | Optional base domain metamodel (`OPModelObject`, `#uuid`, announcements) |
 | **`plugins`** | Core & Platform | *(only `BaselineOfOpenPonkPlugins`)* | All notation plugins | Umbrella baseline assembling the all-in-one build |
 | **`simulation`** | Core & Platform | `OpenPonk-ModelSimulation`, `OpenPonk-Simulation` | `openponk-model`, `openponk` | Discrete-event/step model simulator and GUI simulation bridge |
 | **`openponk-git`** | Core & Platform | `OpenPonk-Git` | `openponk` | GitHub/GitLab project upload/download integration |
 | **`class-editor`** | Notation Plugin | `OpenPonk-ClassEditor`, `OpenPonk-ClassEditor-Plugins` | `openponk`, `uml-xmi`, `uml-bootstrap-generator`, `uml-profiles` | UML Class Diagram editor, profile application UI, and profile generator wizard |
 | **`borm-model`** | Notation Plugin | `OpenPonk-BormModel` | `openponk-model`, `synchronized-links` | BORM domain metamodel |
 | **`borm-editor`** | Notation Plugin | `OpenPonk-BormEditor`, `OpenPonk-BormSimulation` | `borm-model`, `simulation`, `openponk` | BORM diagram editor, BormLang DSL (`PetitParser`), token simulator |
-| **`BPMN`** | Notation Plugin | `OpenPonk-BPMN`, `OpenPonk-BPMN-XML`, `OpenPonk-BPMN-Validation`, `OpenPonk-BPMN-Simulation` | `openponk`, `openponk-model`, `simulation`, `xml-dom-visitor` | BPMN 2.0 editor, XML import/export, validation, and simulation |
+| **`BPMN`** | Notation Plugin | `OpenPonk-BPMN`, `OpenPonk-BPMN-XML`, `OpenPonk-BPMN-Validation`, `OpenPonk-BPMN-Simulation` | `openponk`, `openponk-model`, `simulation` | BPMN 2.0 editor, XML export, validation, and simulation |
 | **`petrinets`** | Notation Plugin | `OpenPonk-PetriNets` | `openponk`, `simulation` | Place/Transition Petri nets editor and simulator |
 | **`fsm-editor`** | Notation Plugin | `OpenPonk-FSM` | `openponk`, `openponk-model` | Finite-State Machine editor, recognizer, and GraphML serializer (`Mustache`) |
 | **`markov-chains`** | Notation Plugin | `OpenPonk-MarkovChains` | `openponk`, `openponk-model` | Markov chains editor, simulator, and Zinc solver client (`Mustache`) |
@@ -139,12 +139,12 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
 | **`DEMO`** | Notation Plugin | `OpenPonk-DEMO` | `openponk`, `openponk-model` | DEMO enterprise ontology notation plugin |
 | **`uml-metamodel`** | UML & OntoUML | `OpenPonk-UML-Meta`, `OpenPonk-UML-Metamodel` *(generated — locked)* | *(none)* | Meta-layer and generated OMG UML 2.5 metamodel |
 | **`uml-bootstrap-generator`** | UML & OntoUML | `OpenPonk-UML-Bootstrap` *(locked)*, `OpenPonk-UML-BootstrapGenerator` | `xmi`, `pharo-changes-builder` | Generator for `OpenPonk-UML-Metamodel` and custom UML profile packages |
-| **`uml-profiles`** | UML & OntoUML | `OpenPonk-UML-Profiles`, `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile` | `uml-metamodel` | UML profile registration, stereotype mechanism, and example profiles |
+| **`uml-profiles`** | UML & OntoUML | `OpenPonk-UML-Profiles`, `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile` | `uml-metamodel`, `uml-xmi` | UML profile registration, stereotype mechanism, and example profiles |
 | **`uml-xmi`** | UML & OntoUML | `OpenPonk-UML-XMI` | `xmi`, `uml-metamodel` | XMI serialization/deserialization for UML models and profiles |
 | **`ontouml-profile`** | UML & OntoUML | `OpenPonk-OntoUML-Profile`, `OpenPonk-OntoUML-Plugin` | `class-editor` | OntoUML stereotype profile and Class Editor UI plugin |
 | **`ontouml-modelquery`** | UML & OntoUML | `OpenPonk-OntoUML-ModelQuery` | `ontouml-profile` | Query utilities for inspecting/filtering OntoUML models |
 | **`ontouml-patterns`** | UML & OntoUML | `OpenPonk-OntoUML-Patterns` | `ontouml-profile` | OntoUML ontology design patterns catalog and wizards |
-| **`ontouml-verifications`** | UML & OntoUML | `OpenPonk-OntoUML-Verifications` | `ontouml-modelquery` | OntoUML verification rules and anti-pattern detectors (`PetitParser`) |
+| **`ontouml-verifications`** | UML & OntoUML | `OpenPonk-OntoUML-Verifications` | `ontouml-modelquery` | OntoUML verification rules and anti-pattern detectors |
 | **`openponk-ontouml-to-uml-transformation`** | UML & OntoUML | `OpenPonk-OntoUML-Transformations` | `ontouml-modelquery` | Model-to-model transformations from OntoUML to implementation UML |
 | **`synchronized-links`** | Shared Library | `OpenPonk-SynchronizedLinks` | *(none)* | Self-synchronizing bidirectional object references |
 | **`zoomer`** | Shared Library | `OpenPonk-Zoomer` | *(none)* | World and canvas zoom scaling widget |
@@ -158,11 +158,11 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
 | :--- | :--- | :--- |
 | **`Roassal`** (Roassal3) | Canvas and vector graphics rendering engine | `openponk` (`OpenPonk-Roassal`) |
 | **`RoassalExporters`** | Diagram export to image/vector formats | `openponk` (`OpenPonk-Roassal`) |
-| **`Magritte`** | Legacy baseline dependency (Workbench property forms now use `OPDynamicForm` declarative bindings instead of Magritte descriptors) | `openponk` (`OpenPonk-Core`, `OpenPonk-Spec`) |
+| **`Magritte`** | Supported declarative property-form alternative rendered via `OPPropertiesFormMagritteVisitor` (notations may choose either Magritte descriptions or overriding `buildEditorForm:` with `OPDynamicForm` declarative bindings; actively used by `OpenPonk-ClassEditor`) | `openponk` (`OpenPonk-Core`, `OpenPonk-Spec`) |
 | **`Mocketry`** | Mocking framework for unit tests | `openponk` (`OpenPonk-Core`) |
 | **`XPath`** | XML path querying | `openponk` (`OpenPonk-Core`) |
 | **`NeoJSON`** | JSON serialization for projects and diagrams | `openponk` (`OpenPonk-Core`) |
 | **`XMLParser`** | DOM XML parsing | `xml-dom-visitor` (`OpenPonk-XMLDOMVisitor`) |
 | **`XMLWriter`** | XML stream writing | `xmi` (`OpenPonk-XMI`) |
-| **`PetitParser`** | Parser combinators for DSLs and expressions | `borm-editor`, `ontouml-verifications` |
+| **`PetitParser`** | Parser combinators for DSLs and expressions | `borm-editor` |
 | **`Mustache`** | Template engine for code/file export | `fsm-editor`, `markov-chains`, `ERD` |
