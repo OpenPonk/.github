@@ -1,6 +1,6 @@
 # OpenPonk Complete Repository, Package & Dependency Catalog
 
-This document provides the complete three-level inventory of all 39 repositories in the **`OpenPonk`** GitHub organization (28 active Pharo repositories, 4 non-Pharo infrastructure/web repositories, and 7 deprecated/archived repositories), including `BaselineOf*` groups, package tags, class/extension counts, and bottom-up dependency layers.
+This document provides the complete three-level inventory of all 40 repositories in the **`OpenPonk`** GitHub organization (28 active Pharo repositories, 5 non-Pharo infrastructure/web repositories, and 7 deprecated/archived repositories), including `BaselineOf*` groups, package tags, class/extension counts, and bottom-up dependency layers.
 
 For global architectural rules, the five runtime component layers, instance multiplicities, and element lifecycles (`Close`, `Hide`, `Remove`), see [`architecture_core.md`](./architecture_core.md).
 
@@ -8,7 +8,7 @@ For global architectural rules, the five runtime component layers, instance mult
 
 *(Note: Class and extension counts below are approximate order-of-magnitude indicators rounded upward to account for ongoing growth. Every test package `*-Tests` mirrors the tags of its production package without using the word `Tests`.)*
 
-### CATEGORY 1: Core & Platform (5 Repositories)
+### CATEGORY 1: Core & Distribution (2 Repositories)
 
 #### 1. `openponk`
 * **Purpose:** Core of the OpenPonk modeling platform (ViewModels, Controllers, DiagramElements, Roassal3 diagram rendering, Spec2 workbench GUI, persistence, Undo/Redo).
@@ -38,7 +38,16 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Internal baseline requires:** `OpenPonk-Core`, `OpenPonk-Spec` (loaded via `dev-plugin` group; `OpenPonk-DevTools-Tests` requires `OpenPonk-DevTools` and `OpenPonk-Core-Tests`)
     * **Role:** Developer utilities, release download statistics, test failure exporters, and runtime mutation watchdog tools.
 
-#### 2. `openponk-model`
+#### 2. `plugins`
+* **Purpose:** Umbrella repository for assembling all-in-one OpenPonk builds and distributions.
+* **Baseline (`BaselineOfOpenPonkPlugins`):**
+  * **External dependencies:** None directly.
+  * **Internal dependencies:** `class-editor` (group `complete`), `borm-editor` (group `plugin`), `petrinets` (group `plugin`), `fsm-editor` (group `plugin`), `BPMN` (group `plugin`), `markov-chains` (group `plugin`), `ERD` (group `plugin`), `DEMO` (group `plugin`), `openponk` (group `dev-plugin`, loaded in `dev` group), `uml-bootstrap-generator` (group `dev-plugin`, loaded in `dev` group).
+* **Packages:** *(No application packages; contains only `BaselineOfOpenPonkPlugins`.)*
+
+### CATEGORY 2: Optional Platform Extensions (3 Repositories)
+
+#### 3. `openponk-model`
 * **Purpose:** Optional foundational domain metamodel providing a quick bootstrap with common model features (`#uuid`, announcements, associations) for notations that do not require an independent custom metamodel.
 * **Baseline (`BaselineOfOpenPonkModel`):** External dependencies: None. Internal dependencies: `openponk` (`OpenPonk`, declared in `default` group only; note that `OpenPonk-Model` tag `ViewModels` statically references `OpenPonk-Core`, so `openponk` must load before `openponk-model`).
 * **Packages:**
@@ -46,13 +55,6 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Tags:** `[Manifest, ModelObjects, ViewModels]`
     * **Internal baseline requires:** None declared in `plugin` group (`OpenPonk` and `OpenPonk-Model-Tests` in `default` group; statically depends on `OpenPonk-Core` via `ViewModels`).
     * **Role:** Reusable base classes for domain models (`OPModelObject`, `OPDirectedAssociation`, etc.) and their base view models.
-
-#### 3. `plugins`
-* **Purpose:** Umbrella repository for assembling all-in-one OpenPonk builds and distributions.
-* **Baseline (`BaselineOfOpenPonkPlugins`):**
-  * **External dependencies:** None directly.
-  * **Internal dependencies:** `class-editor` (group `complete`), `borm-editor` (group `plugin`), `petrinets` (group `plugin`), `fsm-editor` (group `plugin`), `BPMN` (group `plugin`), `markov-chains` (group `plugin`), `ERD` (group `plugin`), `DEMO` (group `plugin`), `openponk` (group `dev-plugin`, loaded in `dev` group).
-* **Packages:** *(No application packages; contains only `BaselineOfOpenPonkPlugins`.)*
 
 #### 4. `simulation`
 * **Purpose:** Discrete-event and step-by-step simulation framework for OpenPonk models and diagrams.
@@ -79,7 +81,7 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Internal baseline requires:** `OpenPonk`
     * **Role:** Toolbar commands and dialogs for pushing/fetching a project (diagram + model) to/from GitHub and GitLab.
 
-### CATEGORY 2: Notation Plugins – Editors & Models (9 Repositories)
+### CATEGORY 3: Notations (Editors & Models) (9 Repositories)
 
 #### 6. `class-editor`
 * **Purpose:** UML Class Diagram editor plugin (with generic UML profile support).
@@ -198,10 +200,10 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Internal baseline requires:** `OpenPonk`, `OpenPonkModel`
     * **Role:** DEMO enterprise ontology diagrams, models, view models, controllers, and shapes.
 
-### CATEGORY 3: UML & OntoUML Ecosystem (9 Repositories)
+### CATEGORY 4: UML & OntoUML Ecosystem (9 Repositories)
 
 #### 15. `uml-metamodel`
-* **Purpose:** Complete OMG UML 2.5 metamodel implementation in Pharo.
+* **Purpose:** OMG UML 2.5 metamodel implementation in Pharo (generated from OMG UML 2.5 XMI specifications).
 * **Architectural Warning:** `OpenPonk-UML-Metamodel` consists of **generated code** (produced by `uml-bootstrap-generator`). Never modify classes or methods in `OpenPonk-UML-Metamodel` manually without updating the generator in `uml-bootstrap-generator`.
 * **Baseline (`BaselineOfOpenPonkUMLMetamodel`):** External dependencies: None. Internal dependencies: None.
 * **Packages:**
@@ -212,22 +214,26 @@ For global architectural rules, the five runtime component layers, instance mult
   * **`OpenPonk-UML-Metamodel`** `(~260 classes, 0 ext)`
     * **Tags:** `[Actions, Activities, Classification, CommonBehavior, CommonStructure, Deployments, InformationFlows, Interactions, Manifest, Meta, Packages, SimpleClassifiers, StateMachines, StructuredClassifiers, UseCases, Values]`
     * **Internal baseline requires:** `OpenPonk-UML-Meta`
-    * **Role:** Generated implementation of the full UML 2.5 specification.
+    * **Role:** Generated implementation of the OMG UML 2.5 metamodel from OMG XMI specifications.
   * **`OP-UML-GTExtensions`** `[deprecated]` – Unloaded extensions for legacy GTInspector and Roassal2 (replaced by OpenPonk's Spec2 Project Tree). Do not use.
 
 #### 16. `uml-bootstrap-generator`
-* **Purpose:** Code generator that bootstraps `OpenPonk-UML-Metamodel` from OMG XMI specifications and generates Pharo packages for UML/OntoUML profiles.
-* **Architectural Note:** Intentionally loaded into production builds (via `class-editor`) both to keep its test suite continuously verified against the active Pharo/UML environment and because `OPUmlProfileGeneratorWizard` in `OpenPonk-ClassEditor` uses its profile generator at runtime.
-* **Baseline (`BaselineOfOpenPonkUMLBootstrapGenerator`):** External dependencies: None directly. Internal dependencies: `xmi` (`OpenPonkXMI`), `pharo-changes-builder` (`ChangesBuilder`).
+* **Purpose:** Lightweight UML profile code generator (`default`) and OMG UML 2.5 metamodel bootstrap generator (`dev-plugin`).
+* **Architectural Note:** Only `OpenPonk-UML-ProfileGenerator` (and its tests) loads in `default` (consumed by `class-editor` for `OPUmlProfileGeneratorWizard` and by `ontouml-profile` for `OntoUMLProfileFactory`). The generated bootstrap metamodel (`OpenPonk-UML-Bootstrap`) and metamodel generator (`OpenPonk-UML-BootstrapGenerator`) load exclusively via `dev-plugin` / `dev` (loaded in `BaselineOfOpenPonkPlugins` group `dev`).
+* **Baseline (`BaselineOfOpenPonkUMLBootstrapGenerator`):** External dependencies: None directly. Internal dependencies: `xmi` (`OpenPonkXMI`), `uml-xmi` (`OpenPonkUMLXMI`), `pharo-changes-builder` (`ChangesBuilder`). Groups: `default` (`OpenPonk-UML-ProfileGenerator`, `OpenPonk-UML-ProfileGenerator-Tests`), `dev-plugin` (`OpenPonk-UML-Bootstrap`, `OpenPonk-UML-BootstrapGenerator`, `OpenPonk-UML-BootstrapGenerator-Tests`), `dev` (`default`, `dev-plugin`).
 * **Packages:**
-  * **`OpenPonk-UML-Bootstrap`** `(~50 classes, 0 ext)`
+  * **`OpenPonk-UML-ProfileGenerator`** `(<5 classes, 0 ext)` & **`OpenPonk-UML-ProfileGenerator-Tests`** `(<5 classes)`
+    * **Tags:** `[Manifest, Profile-Generator, Utilities]`
+    * **Internal baseline requires:** `ChangesBuilder`, `OpenPonkUMLXMI`
+    * **Role:** Lightweight UML profile generator producing Pharo profile classes, extension methods, and profile factories without depending on `OpenPonk-UML-Bootstrap`.
+  * **`OpenPonk-UML-Bootstrap`** `(~50 classes, 0 ext)` *(loaded via `dev-plugin`)*
     * **Tags:** `[Classification, CommonStructure, Deployments, Manifest, Packages, SimpleClassifiers, StructuredClassifiers, Super, Values]`
     * **Internal baseline requires:** None.
     * **Role:** Minimal bootstrap metamodel used to parse raw OMG UML XMI specification files.
-  * **`OpenPonk-UML-BootstrapGenerator`** `(~25 classes, 0 ext)` & **`OpenPonk-UML-BootstrapGenerator-Tests`** `(<10 classes)`
-    * **Tags:** `[Bootstrap-Generator, Manifest, Metamodel-Generator, Profile-Generator, Reader, Templates, Utilities]`
-    * **Internal baseline requires:** `OpenPonkXMI`, `ChangesBuilder`, `OpenPonk-UML-Bootstrap`
-    * **Role:** Code generators producing the bootstrap model, `OpenPonk-UML-Metamodel`, and custom UML profile packages.
+  * **`OpenPonk-UML-BootstrapGenerator`** `(~15 classes, 0 ext)` & **`OpenPonk-UML-BootstrapGenerator-Tests`** `(~11 classes)` *(loaded via `dev-plugin`)*
+    * **Tags:** `[Bootstrap-Generator, Manifest, Metamodel-Generator, Reader, Templates]`
+    * **Internal baseline requires:** `OpenPonkXMI`, `ChangesBuilder`, `OpenPonk-UML-Bootstrap`, `OpenPonk-UML-ProfileGenerator` (`OpenPonk-UML-BootstrapGenerator-Tests` additionally requires `OpenPonk-UML-ProfileGenerator-Tests`)
+    * **Role:** Code generators producing the bootstrap model and `OpenPonk-UML-Metamodel`.
 
 #### 17. `uml-profiles`
 * **Purpose:** Core UML profile application mechanism and small example/test profiles.
@@ -295,7 +301,7 @@ For global architectural rules, the five runtime component layers, instance mult
     * **Internal baseline requires:** `OpenPonkOntoUMLModelQuery`
     * **Role:** Transforms OntoUML constructs into standard implementation UML class models.
 
-### CATEGORY 4: Shared Libraries & Utilities (5 Repositories)
+### CATEGORY 5: Shared Libraries & Utilities (5 Repositories)
 
 #### 24. `synchronized-links`
 * **Purpose:** Self-synchronizing bidirectional relations for Smalltalk objects.
@@ -331,28 +337,29 @@ For global architectural rules, the five runtime component layers, instance mult
 * **Packages:**
   * **`ChangesBuilder`** `(~10 classes, <10 ext)` & **`ChangesBuilder-Tests`** `(10 classes)` – **Tags:** `[Model, Utilities]`; **Role:** Programmatic creation of packages, classes, instance variables, and methods via refactoring changesets.
 
-### CATEGORY 5: Infrastructure, Web & Specifications – Non-Pharo Repositories (4 Repositories)
-* **29. `ci-scripts`** – Shared GitHub Actions workflows and CI scripts used across OpenPonk repositories. *(Note: Individual Pharo repositories often define `.github/dependent-repositories.txt` listing downstream repositories whose CI builds are automatically triggered on push).*
-* **30. `releaser`** – Python scripts for building and publishing numbered OpenPonk releases.
-* **31. `specs-repository`** – Storage for formal specification files (such as OMG UML/XMI specifications consumed by `uml-bootstrap-generator`) and published XMI profile definitions referenced by exported OpenPonk/OntoUML XMI files and saved projects (e.g., `OntoUML/1.0/OntoUML.profile.xmi`, referenced via `https://openponk.org/OntoUML/1.0/`).
-* **32. `openponk.github.io`** – Static HTML website for OpenPonk (edited directly in this repository).
+### CATEGORY 6: Infrastructure, Web & Specifications – Non-Pharo Repositories (5 Repositories)
+* **29. `.github`** – Organization-level GitHub profile (`profile/README.md`) and shared architectural/developer documentation (`architecture_core.md`, `repository_catalog.md`).
+* **30. `ci-scripts`** – Shared GitHub Actions workflows and CI scripts used across OpenPonk repositories. *(Note: Individual Pharo repositories often define `.github/dependent-repositories.txt` listing downstream repositories whose CI builds are automatically triggered on push).*
+* **31. `releaser`** – Python scripts for building and publishing numbered OpenPonk releases.
+* **32. `specs-repository`** – Storage for formal specification files (such as OMG UML/XMI specifications consumed by `uml-bootstrap-generator`) and published XMI profile definitions referenced by exported OpenPonk/OntoUML XMI files and saved projects (e.g., `OntoUML/1.0/OntoUML.profile.xmi`, referenced via `https://openponk.org/OntoUML/1.0/`).
+* **33. `openponk.github.io`** – Static HTML website for OpenPonk (edited directly in this repository).
 
-### CATEGORY 6: Deprecated & Archived Repositories – Outside Active Builds (7 Repositories)
-* **33. `openponk.github.io-sources`** `[deprecated]` – Legacy JavaScript static-site generator for the website; superseded by direct editing in `openponk.github.io`.
-* **34. `demo-editor`** `[deprecated -> DEMO]` – Original non-functional implementation of the DEMO editor; completely replaced by `DEMO`.
-* **35. `uml-shapes`** `[deprecated -> OpenPonk-Core]` – Early partial implementation of OMG UML Diagram Definition / Diagram Interchange. Generalized for all notations and merged into the `DiagramElements` (Shapes) architecture in `OpenPonk-Core`.
-* **36. `file-dialog`** `[deprecated -> NewTools]` – Custom replacement for Pharo's native file dialog; superseded once its concepts were integrated into standard Pharo `NewTools`.
-* **37. `uml-playground`** `[deprecated]` – Historical experimental repository from early UML metamodel development.
-* **38. `xsd`** `[deprecated]` – Unmaintained XML Schema experiments (never loaded into OpenPonk).
-* **39. `xsd-generator`** `[deprecated]` – Unmaintained XSD generator experiments (never loaded into OpenPonk).
+### CATEGORY 7: Deprecated & Archived Repositories – Outside Active Builds (7 Repositories)
+* **34. `openponk.github.io-sources`** `[deprecated]` – Legacy JavaScript static-site generator for the website; superseded by direct editing in `openponk.github.io`.
+* **35. `demo-editor`** `[deprecated -> DEMO]` – Original non-functional implementation of the DEMO editor; completely replaced by `DEMO`.
+* **36. `uml-shapes`** `[deprecated -> OpenPonk-Core]` – Early partial implementation of OMG UML Diagram Definition / Diagram Interchange. Generalized for all notations and merged into the `DiagramElements` (Shapes) architecture in `OpenPonk-Core`.
+* **37. `file-dialog`** `[deprecated -> NewTools]` – Custom replacement for Pharo's native file dialog; superseded once its concepts were integrated into standard Pharo `NewTools`.
+* **38. `uml-playground`** `[deprecated]` – Historical experimental repository from early UML metamodel development.
+* **39. `xsd`** `[deprecated]` – Unmaintained XML Schema experiments (never loaded into OpenPonk).
+* **40. `xsd-generator`** `[deprecated]` – Unmaintained XSD generator experiments (never loaded into OpenPonk).
 
 ## 2. Bottom-Up Dependency Layers & Maintenance Notes
 
 ### 2.1 Architectural Layers (Bottom-Up Dependency Flow)
 * **Layer 0 — Standalone Low-Level Utilities & Base Metamodels (Zero Internal Dependencies):** `synchronized-links`, `zoomer`, `pharo-changes-builder`, `xml-dom-visitor` (external `XMLParser`), `uml-metamodel` (`OpenPonk-UML-Meta` $\rightarrow$ `OpenPonk-UML-Metamodel`).
 * **Layer 1 — Core Infrastructure & Generic XMI Utilities:** `openponk` (`OpenPonk-Roassal` $\rightarrow$ `OpenPonk-Core`; `OpenPonk-Morphic` $\rightarrow$ `OpenPonk-Spec`; `OpenPonk-DevTools`), `xmi` (`OpenPonk-XMI` $\rightarrow$ `OpenPonk-XMI-Inspection`).
-* **Layer 2 — Optional Base Metamodel, Git Integration & UML Tooling:** `openponk-model` (statically references `OpenPonk-Core` via `ViewModels`), `openponk-git`, `uml-xmi`, `uml-bootstrap-generator` (`OpenPonk-UML-Bootstrap` $\rightarrow$ `OpenPonk-UML-BootstrapGenerator`).
-* **Layer 3 — Domain Models, Simulation Framework & UML Profiles:** `borm-model`, `simulation` (`BaselineOfOpenPonkModelSimulation` $\rightarrow$ `BaselineOfOpenPonkSimulation`), `uml-profiles` (`OpenPonk-UML-Profiles` $\rightarrow$ `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile`).
+* **Layer 2 — Optional Base Metamodel, Git Integration & UML XMI:** `openponk-model` (statically references `OpenPonk-Core` via `ViewModels`), `openponk-git`, `uml-xmi`.
+* **Layer 3 — Domain Models, Simulation Framework, UML Profiles & Profile/Bootstrap Generator:** `borm-model`, `simulation` (`BaselineOfOpenPonkModelSimulation` $\rightarrow$ `BaselineOfOpenPonkSimulation`), `uml-profiles` (`OpenPonk-UML-Profiles` $\rightarrow$ `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile`), `uml-bootstrap-generator` (`OpenPonk-UML-ProfileGenerator`; `dev-plugin`: `OpenPonk-UML-Bootstrap` $\rightarrow$ `OpenPonk-UML-BootstrapGenerator`).
 * **Layer 4 — Notation Editors (Core Plugins):** `class-editor` (`plugin` group), general notation editors (`DEMO`, `fsm-editor`, `markov-chains`, `ERD`), and simulated/validated notation editors (`borm-editor`, `BPMN`, `petrinets`).
 * **Layer 5 — OntoUML Ecosystem & Class Editor Extensions:** `ontouml-profile` (`OpenPonk-OntoUML-Profile` $\rightarrow$ `OpenPonk-OntoUML-Plugin`) $\rightarrow$ `ontouml-modelquery`, `ontouml-patterns` $\rightarrow$ `ontouml-verifications`, `openponk-ontouml-to-uml-transformation`, and `class-editor` (`complete-plugin` group: `OpenPonk-ClassEditor-Plugins`).
 * **Layer 6 — All-in-One Distribution Assembly:** `plugins` (`BaselineOfOpenPonkPlugins`).

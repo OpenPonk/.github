@@ -1,8 +1,8 @@
 # OpenPonk Core Runtime Architecture & Repository Overview
 
-This document defines the global architectural rules, runtime component layers, instance multiplicities, element lifecycles, and active repository map of the **OpenPonk** modeling platform (`OpenPonk` GitHub organization: 39 repositories total, comprising 28 active Pharo repositories, 4 non-Pharo infrastructure/web repositories, and 7 deprecated/archived repositories).
+This document defines the global architectural rules, runtime component layers, instance multiplicities, element lifecycles, and active repository map of the **OpenPonk** modeling platform (`OpenPonk` GitHub organization: 40 repositories total, comprising 28 active Pharo repositories, 5 non-Pharo infrastructure/web repositories, and 7 deprecated/archived repositories).
 
-For the detailed three-level package/tag inventory, baseline groups, and bottom-up dependency layers across all 39 repositories, see [`repository_catalog.md`](./repository_catalog.md).
+For the detailed three-level package/tag inventory, baseline groups, and bottom-up dependency layers across all 40 repositories, see [`repository_catalog.md`](./repository_catalog.md).
 
 ## 1. Global Architectural Rules
 
@@ -25,7 +25,7 @@ For the detailed three-level package/tag inventory, baseline groups, and bottom-
 4. **Flexible Metamodel Foundation:**
    * **Minimal Requirement (`#uuid`):** OpenPonk supports completely independent domain metamodels. Any Smalltalk object can serve as a domain model or model element; the only mandatory requirement imposed by the platform is implementing the `#uuid` method.
    * **Optional Bootstrap Metamodel (`openponk-model`):** Provides a lightweight optional base (`OPModelObject`, `OPDirectedAssociation`, etc.) offering `#uuid`, announcements, and common model functionality out of the box. Used directly or transitively (e.g., via `simulation` in `petrinets`) by most non-UML notations (BORM, BPMN, Petri Nets, FSM, Markov Chains, ERD, DEMO).
-   * **UML & OntoUML Ecosystem (`uml-metamodel`):** Uses an independent, full OMG UML 2.5 implementation (`OpenPonk-UML-Meta` and `OpenPonk-UML-Metamodel`). **Crucial Rule:** Only `OpenPonk-UML-Metamodel` (and `OpenPonk-UML-Bootstrap`) is **generated code** produced by `uml-bootstrap-generator` and must **never** be modified manually without corresponding changes in the generator. Unlike `OpenPonk-UML-Metamodel`, `OpenPonk-OntoUML-Profile` is maintained as a regular package rather than locked generated code.
+   * **UML & OntoUML Ecosystem (`uml-metamodel`):** Uses an independent OMG UML 2.5 implementation (`OpenPonk-UML-Meta` and `OpenPonk-UML-Metamodel`). **Crucial Rule:** Only `OpenPonk-UML-Metamodel` (and `OpenPonk-UML-Bootstrap`) is **generated code** produced by `uml-bootstrap-generator` and must **never** be modified manually without corresponding changes in the generator. Unlike `OpenPonk-UML-Metamodel`, `OpenPonk-OntoUML-Profile` is maintained as a regular package rather than locked generated code.
 
 5. **Status Marker Definitions:**
    * *(unmarked)* – **Active:** Loaded in the standard all-in-one build.
@@ -123,22 +123,22 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
 
 | Repository | Category | Production Package(s) | Internal Prerequisites | Role & Scope |
 | :--- | :--- | :--- | :--- | :--- |
-| **`openponk`** | Core & Platform | `OpenPonk-Roassal`, `OpenPonk-Core`, `OpenPonk-Morphic`, `OpenPonk-Spec`, `OpenPonk-DevTools` | `synchronized-links`, `zoomer` | Core platform, ViewModels, Controllers, Shapes, Spec2 GUI, Undo/Redo, persistence |
-| **`openponk-model`** | Core & Platform | `OpenPonk-Model` | `openponk` *(static via `ViewModels`; baseline `default` group only)* | Optional base domain metamodel (`OPModelObject`, `#uuid`, announcements) |
-| **`plugins`** | Core & Platform | *(only `BaselineOfOpenPonkPlugins`)* | All notation plugins | Umbrella baseline assembling the all-in-one build |
-| **`simulation`** | Core & Platform | `OpenPonk-ModelSimulation`, `OpenPonk-Simulation` | `openponk-model`, `openponk` | Discrete-event/step model simulator and GUI simulation bridge |
-| **`openponk-git`** | Core & Platform | `OpenPonk-Git` | `openponk` | GitHub/GitLab project upload/download integration |
-| **`class-editor`** | Notation Plugin | `OpenPonk-ClassEditor`, `OpenPonk-ClassEditor-Plugins` | `openponk`, `uml-xmi`, `uml-bootstrap-generator`, `uml-profiles` | UML Class Diagram editor, profile application UI, and profile generator wizard |
-| **`borm-model`** | Notation Plugin | `OpenPonk-BormModel` | `openponk-model`, `synchronized-links` | BORM domain metamodel |
-| **`borm-editor`** | Notation Plugin | `OpenPonk-BormEditor`, `OpenPonk-BormSimulation` | `borm-model`, `simulation`, `openponk` | BORM diagram editor, BormLang DSL (`PetitParser`), token simulator |
-| **`BPMN`** | Notation Plugin | `OpenPonk-BPMN`, `OpenPonk-BPMN-XML`, `OpenPonk-BPMN-Validation`, `OpenPonk-BPMN-Simulation` | `openponk`, `openponk-model`, `simulation` | BPMN 2.0 editor, XML export, validation, and simulation |
-| **`petrinets`** | Notation Plugin | `OpenPonk-PetriNets` | `openponk`, `simulation` | Place/Transition Petri nets editor and simulator |
-| **`fsm-editor`** | Notation Plugin | `OpenPonk-FSM` | `openponk`, `openponk-model` | Finite-State Machine editor, recognizer, and GraphML serializer (`Mustache`) |
-| **`markov-chains`** | Notation Plugin | `OpenPonk-MarkovChains` | `openponk`, `openponk-model` | Markov chains editor, simulator, and Zinc solver client (`Mustache`) |
-| **`ERD`** | Notation Plugin | `OpenPonk-ERD` | `openponk`, `openponk-model` | Entity-Relationship Diagram editor and SQL/DDL generator (`Mustache`) |
-| **`DEMO`** | Notation Plugin | `OpenPonk-DEMO` | `openponk`, `openponk-model` | DEMO enterprise ontology notation plugin |
+| **`openponk`** | Core & Distribution | `OpenPonk-Roassal`, `OpenPonk-Core`, `OpenPonk-Morphic`, `OpenPonk-Spec`, `OpenPonk-DevTools` | `synchronized-links`, `zoomer` | Core platform, ViewModels, Controllers, Shapes, Spec2 GUI, Undo/Redo, persistence |
+| **`plugins`** | Core & Distribution | *(only `BaselineOfOpenPonkPlugins`)* | All notation plugins | Umbrella baseline assembling the all-in-one build |
+| **`openponk-model`** | Optional Platform Extension | `OpenPonk-Model` | `openponk` *(static via `ViewModels`; baseline `default` group only)* | Optional base domain metamodel (`OPModelObject`, `#uuid`, announcements) |
+| **`simulation`** | Optional Platform Extension | `OpenPonk-ModelSimulation`, `OpenPonk-Simulation` | `openponk-model`, `openponk` | Discrete-event/step model simulator and GUI simulation bridge |
+| **`openponk-git`** | Optional Platform Extension | `OpenPonk-Git` | `openponk` | GitHub/GitLab project upload/download integration |
+| **`class-editor`** | Notation (Editor / Model) | `OpenPonk-ClassEditor`, `OpenPonk-ClassEditor-Plugins` | `openponk`, `uml-xmi`, `uml-bootstrap-generator`, `uml-profiles` | UML Class Diagram editor, profile application UI, and profile generator wizard |
+| **`borm-model`** | Notation (Editor / Model) | `OpenPonk-BormModel` | `openponk-model`, `synchronized-links` | BORM domain metamodel |
+| **`borm-editor`** | Notation (Editor / Model) | `OpenPonk-BormEditor`, `OpenPonk-BormSimulation` | `borm-model`, `simulation`, `openponk` | BORM diagram editor, BormLang DSL (`PetitParser`), token simulator |
+| **`BPMN`** | Notation (Editor / Model) | `OpenPonk-BPMN`, `OpenPonk-BPMN-XML`, `OpenPonk-BPMN-Validation`, `OpenPonk-BPMN-Simulation` | `openponk`, `openponk-model`, `simulation` | BPMN 2.0 editor, XML export, validation, and simulation |
+| **`petrinets`** | Notation (Editor / Model) | `OpenPonk-PetriNets` | `openponk`, `simulation` | Place/Transition Petri nets editor and simulator |
+| **`fsm-editor`** | Notation (Editor / Model) | `OpenPonk-FSM` | `openponk`, `openponk-model` | Finite-State Machine editor, recognizer, and GraphML serializer (`Mustache`) |
+| **`markov-chains`** | Notation (Editor / Model) | `OpenPonk-MarkovChains` | `openponk`, `openponk-model` | Markov chains editor, simulator, and Zinc solver client (`Mustache`) |
+| **`ERD`** | Notation (Editor / Model) | `OpenPonk-ERD` | `openponk`, `openponk-model` | Entity-Relationship Diagram editor and SQL/DDL generator (`Mustache`) |
+| **`DEMO`** | Notation (Editor / Model) | `OpenPonk-DEMO` | `openponk`, `openponk-model` | DEMO enterprise ontology notation plugin |
 | **`uml-metamodel`** | UML & OntoUML | `OpenPonk-UML-Meta`, `OpenPonk-UML-Metamodel` *(generated — locked)* | *(none)* | Meta-layer and generated OMG UML 2.5 metamodel |
-| **`uml-bootstrap-generator`** | UML & OntoUML | `OpenPonk-UML-Bootstrap` *(locked)*, `OpenPonk-UML-BootstrapGenerator` | `xmi`, `pharo-changes-builder` | Generator for `OpenPonk-UML-Metamodel` and custom UML profile packages |
+| **`uml-bootstrap-generator`** | UML & OntoUML | `OpenPonk-UML-ProfileGenerator`, `OpenPonk-UML-Bootstrap` *(dev-plugin, locked)*, `OpenPonk-UML-BootstrapGenerator` *(dev-plugin)* | `xmi`, `uml-xmi`, `pharo-changes-builder` | Lightweight UML profile generator (`default`) and OMG UML metamodel bootstrap generator (`dev-plugin`) |
 | **`uml-profiles`** | UML & OntoUML | `OpenPonk-UML-Profiles`, `OpenPonk-ClockProfile`, `OpenPonk-IssuesProfile` | `uml-metamodel`, `uml-xmi` | UML profile registration, stereotype mechanism, and example profiles |
 | **`uml-xmi`** | UML & OntoUML | `OpenPonk-UML-XMI` | `xmi`, `uml-metamodel` | XMI serialization/deserialization for UML models and profiles |
 | **`ontouml-profile`** | UML & OntoUML | `OpenPonk-OntoUML-Profile`, `OpenPonk-OntoUML-Plugin` | `class-editor` | OntoUML stereotype profile and Class Editor UI plugin |
