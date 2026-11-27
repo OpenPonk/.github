@@ -1,6 +1,6 @@
 # OpenPonk Core Runtime Architecture & Repository Overview
 
-This document defines the global architectural rules, runtime component layers, instance multiplicities, element lifecycles, and active repository map of the **OpenPonk** modeling platform (`OpenPonk` GitHub organization: 40 repositories total, comprising 28 active Pharo repositories, 5 non-Pharo infrastructure/web repositories, and 7 deprecated/archived repositories).
+This document defines the global architectural rules, runtime component layers, instance multiplicities, element lifecycles, and active repository map of the **OpenPonk** modeling platform (`OpenPonk` GitHub organization: 41 repositories total, comprising 29 active Pharo repositories, 5 non-Pharo infrastructure/web repositories, and 7 deprecated/archived repositories).
 
 For the detailed three-level package/tag inventory, baseline groups, and bottom-up dependency layers across all 40 repositories, see [`repository_catalog.md`](./repository_catalog.md).
 
@@ -117,7 +117,7 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
     2. *Element is present in one or more closed (unloaded) diagrams:* No `OPElementController` exists for those closed diagrams; destroys all associated `DiagramElement`(s) in those diagrams, the `ViewModel`, and the `Domain Model`.
     3. *Element is not present in any diagram (exists only in the model / Project Tree):* Neither `OPElementController` nor `DiagramElement` exists; destroys the `ViewModel` and the `Domain Model`.
 
-## 3. Compact Active Repository & Dependency Map (28 Pharo Repositories)
+## 3. Compact Active Repository & Dependency Map (29 Pharo Repositories)
 
 *(Every production package listed below has a companion `*-Tests` package unless noted in `repository_catalog.md`.)*
 
@@ -127,6 +127,7 @@ OpenPonk separates project/domain data, model-level UI abstraction, visual diagr
 | **`plugins`** | Core & Distribution | *(only `BaselineOfOpenPonkPlugins`)* | All notation plugins | Umbrella baseline assembling the all-in-one build |
 | **`openponk-model`** | Optional Platform Extension | `OpenPonk-Model` | `openponk` *(static via `ViewModels`; baseline `default` group only)* | Optional base domain metamodel (`OPModelObject`, `#uuid`, announcements) |
 | **`simulation`** | Optional Platform Extension | `OpenPonk-ModelSimulation`, `OpenPonk-Simulation` | `openponk-model`, `openponk` | Discrete-event/step model simulator and GUI simulation bridge |
+| **`validation`** | Optional Platform Extension | `OpenPonk-ModelValidation`, `OpenPonk-Validation` | `openponk` | Headless model validation engine, transient diagram highlighting, and Spec2 results UI |
 | **`openponk-git`** | Optional Platform Extension | `OpenPonk-Git` | `openponk` | GitHub/GitLab project upload/download integration |
 | **`class-editor`** | Notation (Editor / Model) | `OpenPonk-ClassEditor`, `OpenPonk-ClassEditor-Plugins` | `openponk`, `uml-xmi`, `uml-bootstrap-generator`, `uml-profiles` | UML Class Diagram editor, profile application UI, and profile generator wizard |
 | **`borm-model`** | Notation (Editor / Model) | `OpenPonk-BormModel` | `openponk-model`, `synchronized-links` | BORM domain metamodel |
