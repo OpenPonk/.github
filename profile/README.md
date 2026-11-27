@@ -13,6 +13,8 @@ For contributors and researchers, the platform architecture is documented in two
    Global package and testing rules, the five runtime architectural layers (`Domain Model`, `ViewModel`, `DiagramElement`/`Shape`, `Controller`, `Workbench & Editor GUI`), instance multiplicities, element lifecycles (`Close`, `Hide`, `Remove from Model`), and the compact active repository overview.
 2. **[Complete Repository, Package & Dependency Catalog (`repository_catalog.md`)](https://github.com/OpenPonk/.github/blob/main/profile/repository_catalog.md)**
    Detailed three-level inventory of all repositories in the `OpenPonk` organization, `BaselineOf*` groups, package tags, external dependencies, and bottom-up dependency layers.
+3. **[Contributing Guide (`CONTRIBUTING.md`)](https://github.com/OpenPonk/.github/blob/main/CONTRIBUTING.md)**
+   Workflow for forking repositories, loading changes in Pharo/Iceberg, running tests, and opening pull requests.
 
 ## Active Repositories Overview
 
